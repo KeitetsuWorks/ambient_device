@@ -19,7 +19,7 @@ import bme280
 import time
 
 
-def post_BME280Data_to_Ambient(data):
+def post_BME280Data_to_Ambient(data_creation_time, data):
     with open('ambient.json', 'r') as f:
         dict_configs = json.load(f)
 
@@ -28,7 +28,7 @@ def post_BME280Data_to_Ambient(data):
     am = ambient.Ambient(str_channelId, str_writeKey)
 
     dict_data = {
-        "created": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "created": time.strftime("%Y-%m-%d %H:%M:%S", data_creation_time),
         "d1": data.temperature,
         "d2": data.humidity,
         "d3": data.pressure
@@ -57,9 +57,10 @@ if __name__ == '__main__':
     # the sample method will take a single reading and return a
     # compensated_reading object
     data = bme280.sample(bus, address, calibration_params)
+    data_creation_time = time.localtime()
 
     for i in range(0, 5):
-        result = post_BME280Data_to_Ambient(data)
+        result = post_BME280Data_to_Ambient(data_creation_time, data)
         if result == True:
             break
         time.sleep(2)
